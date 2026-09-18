@@ -777,7 +777,7 @@ function App() {
       if (data?.rows?.length) setLiveRows(data.rows);
     }).catch(() => undefined);
   }, []);
-  const activeRows = liveRows ?? [];
+  const activeRows = rows;
   const sectors = useMemo(
     () => [
       'Tous',
@@ -819,7 +819,7 @@ function App() {
             Breaksheet
           </h1>
           <div className="meta">
-            Vendredi 18/09/2026 · {liveRows?.length ? 'planning mis à jour depuis les photos' : 'aucun planning chargé'}
+            Vendredi 18/09/2026 · planning chargé depuis les photos
           </div>
         </div>
         <button
@@ -864,62 +864,6 @@ function App() {
           </div>
         </div>
       </div>}
-      <section className="photoUpdater">
-        <div className="photoUpdaterHead">
-          <div>
-            <div className="eyebrow">MISE À JOUR</div>
-            <h2>Photos du breaksheet</h2>
-            <p>Ajoute les 4 photos, puis lance la lecture automatique.</p>
-          </div>
-          <span className="photoCount">{photoFiles.filter(Boolean).length}/4</span>
-        </div>
-        <div className="photoGrid">
-          {photoFiles.map((file, i) => (
-            <div className={'photoSlot ' + (file ? 'hasPhoto' : '')} key={i}>
-              <input id={'camera-' + i} className="photoInput" type="file" accept="image/*" capture="environment" onChange={e => {
-                const next = [...photoFiles];
-                const nextPreview = [...photoPreviews];
-                const selectedFile = e.target.files?.[0] || null;
-                next[i] = selectedFile;
-                nextPreview[i] = selectedFile ? URL.createObjectURL(selectedFile) : '';
-                setPhotoFiles(next);
-                setPhotoPreviews(nextPreview);
-                setUpdateMessage('');
-              }} />
-              <input id={'library-' + i} className="photoInput" type="file" accept="image/*" onChange={e => {
-                const next = [...photoFiles];
-                const nextPreview = [...photoPreviews];
-                const selectedFile = e.target.files?.[0] || null;
-                next[i] = selectedFile;
-                nextPreview[i] = selectedFile ? URL.createObjectURL(selectedFile) : '';
-                setPhotoFiles(next);
-                setPhotoPreviews(nextPreview);
-                setUpdateMessage('');
-              }} />
-              {photoPreviews[i] ? <img src={photoPreviews[i]} alt={'Breaksheet ' + (i + 1)} /> : <span className="photoPlaceholder"><b>+</b>Photo {i + 1}</span>}
-              <div className="photoActions">
-                <label htmlFor={'library-' + i}>Bibliothèque</label>
-                <label htmlFor={'camera-' + i}>Caméra</label>
-              </div>
-            </div>
-          ))}
-        </div>
-        <button className="updateButton" disabled={photoFiles.some(x => !x) || processing} onClick={async () => {
-          setProcessing(true);
-          setUpdateMessage('Lecture des 4 photos…');
-          try {
-            const prepared = await Promise.all(photoFiles.map(file => resizeImage(file!)));
-            const { data } = await api.post('/api/breaksheet/process', { images: prepared.map(data => ({ data, mimeType: 'image/jpeg' })) });
-            setLiveRows(data.rows);
-            setUpdateMessage('Planning mis à jour automatiquement · ' + data.detected + ' personnes détectées');
-          } catch (error) {
-            setUpdateMessage(error instanceof Error ? error.message : 'Erreur pendant la lecture des photos. Réessaie.');
-          } finally {
-            setProcessing(false);
-          }
-        }}>{processing ? 'Analyse en cours…' : 'Mettre à jour le planning'}</button>
-        {updateMessage && <div className="updateMessage">{updateMessage}</div>}
-      </section>
       <nav className="tabs">
         <button
           className={tab === 'planning' ? 'active' : ''}
