@@ -773,7 +773,7 @@ function App() {
       if (data?.rows?.length) setLiveRows(data.rows);
     }).catch(() => undefined);
   }, []);
-  const activeRows = liveRows ?? [];
+  const activeRows = liveRows?.length ? liveRows : rows;
   const sectors = useMemo(
     () => [
       'Tous',
