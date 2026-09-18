@@ -908,8 +908,8 @@ function App() {
             const { data } = await api.post('/api/breaksheet/process', { images: prepared.map(data => ({ data, mimeType: 'image/jpeg' })) });
             setLiveRows(data.rows);
             setUpdateMessage('Planning mis à jour automatiquement · ' + data.detected + ' personnes détectées');
-          } catch {
-            setUpdateMessage('Erreur pendant la lecture des photos. Vérifie les 4 images et réessaie.');
+          } catch (error) {
+            setUpdateMessage(error instanceof Error ? error.message : 'Erreur pendant la lecture des photos. Réessaie.');
           } finally {
             setProcessing(false);
           }
