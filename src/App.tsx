@@ -812,7 +812,7 @@ function App() {
         <div>
           <div className="eyebrow">CUSTODIAL DLP</div>
           <h1>
-            Fantasyland <span>Breaksheet</span>
+            Breaksheet
           </h1>
           <div className="meta">
             Vendredi 18/09/2026 · {liveRows?.length ? 'planning mis à jour depuis les photos' : 'aucun planning chargé'}
