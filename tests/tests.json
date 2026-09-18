@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Afficher un planning vide après suppression des données",
+    "sanity": true,
+    "viewport": "desktop",
+    "covers": ["planning vide", "absence des Cast Members", "absence de données de référence"],
+    "description": "Vérifie qu'aucun Cast Member de référence n'est affiché lorsque les données breaksheet sont absentes.",
+    "steps": ["Ouvrir le site", "Vérifier le Planning", "Vérifier la vue Maintenant"],
+    "expected": "Aucun Cast Member n'est affiché dans Planning ni dans Maintenant et le site indique qu'aucun planning n'est chargé."
+  },
+  {
+    "name": "Accéder aux 4 emplacements photo",
+    "viewport": "mobile",
+    "covers": ["mise à jour depuis 4 photos", "sélection depuis la bibliothèque photo", "sélection depuis la caméra"],
+    "description": "Vérifie que l'utilisateur peut préparer les quatre photos nécessaires à une nouvelle lecture.",
+    "steps": ["Ouvrir le site sur mobile", "Vérifier les 4 emplacements photo", "Vérifier que Bibliothèque et Caméra sont disponibles"],
+    "expected": "Les 4 emplacements photo sont présents, chacun propose Bibliothèque et Caméra, et le planning reste vide tant qu'aucune lecture n'a été effectuée."
+  },
+  {
+    "name": "Naviguer entre Planning et Maintenant",
+    "viewport": "desktop",
+    "covers": ["navigation Planning", "navigation Maintenant", "état sans données"],
+    "description": "Vérifie les deux vues principales lorsque le planning n'est pas encore chargé.",
+    "steps": ["Ouvrir l'onglet Planning", "Ouvrir l'onglet Maintenant", "Revenir à Planning"],
+    "expected": "Les deux onglets sont accessibles sans erreur et aucune personne n'est affichée."
+  },
+  {
+    "name": "Gérer une recherche sans résultat",
+    "viewport": "mobile",
+    "covers": ["recherche vide", "état sans résultat", "interface sans feuilles originales"],
+    "description": "Vérifie qu'une recherche ne fait pas réapparaître de planning de référence.",
+    "steps": ["Saisir un nom dans la recherche", "Vérifier le contenu de la page", "Vérifier qu'aucun bouton des feuilles originales n'est présent"],
+    "expected": "Aucun Cast Member n'est affiché et le bouton des feuilles originales n'est pas présent."
+  }
+]
