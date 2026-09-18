@@ -83,13 +83,16 @@ export async function onRequestPost(context: PagesFunction<Env>) {
     const allRows: Row[] = [];
     for (const image of payload.images) {
       const result = await context.env.AI.run(
-        '@cf/meta/llama-3.2-11b-vision-instruct',
+        '@cf/google/gemma-4-26b-a4b-it',
         {
           messages: [
             { role: 'system', content: 'Tu es un extracteur de données de planning. Respecte strictement le format JSON demandé.' },
             { role: 'user', content: prompt },
           ],
           image: image.data,
+          max_tokens: 4096,
+          temperature: 0,
+          chat_template_kwargs: { enable_thinking: false },
         }
       );
       const rows = extractRows(result);
@@ -131,6 +134,7 @@ export async function onRequestPost(context: PagesFunction<Env>) {
     });
   } catch (error) {
     console.error(error);
-    return json({ error: 'Erreur pendant la lecture OCR. Vérifie les 4 photos et réessaie.' }, 500);
+    const message = error instanceof Error ? error.message : String(error);
+    return json({ error: `OCR Cloudflare : ${message}` }, 500);
   }
 }
