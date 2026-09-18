@@ -87,12 +87,16 @@ export async function onRequestPost(context: PagesFunction<Env>) {
         {
           messages: [
             { role: 'system', content: 'Tu es un extracteur de données de planning. Respecte strictement le format JSON demandé.' },
-            { role: 'user', content: prompt },
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: prompt },
+                { type: 'image_url', image_url: { url: image.data } },
+              ],
+            },
           ],
-          image: image.data,
           max_tokens: 4096,
           temperature: 0,
-          chat_template_kwargs: { enable_thinking: false },
         }
       );
       const rows = extractRows(result);
