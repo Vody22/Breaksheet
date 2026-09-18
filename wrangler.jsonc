@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "breaksheet",
+  "main": "worker.ts",
+  "compatibility_date": "2026-09-19",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "r2_buckets": [
+    {
+      "binding": "BREAKSHEET_BUCKET",
+      "bucket_name": "breaksheet"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  }
+}
