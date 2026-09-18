@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { api, image } from '@appdeploy/client';
 import {
   Search,
   Moon,
@@ -699,6 +698,41 @@ const lands = [
   'Adventureland',
 ];
 
+const api = {
+  async get(path: string) {
+    const res = await fetch(path);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'Erreur réseau');
+    return { data };
+  },
+  async post(path: string, body: unknown) {
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'Erreur réseau');
+    return { data };
+  },
+};
+
+async function resizeImage(file: File) {
+  const bitmap = await createImageBitmap(file);
+  const maxDimension = 1600;
+  const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas indisponible');
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+  return canvas.toDataURL('image/jpeg', 0.82);
+}
+
 function minutes(t: string) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
@@ -870,8 +904,8 @@ function App() {
           setProcessing(true);
           setUpdateMessage('Lecture des 4 photos…');
           try {
-            const prepared = await Promise.all(photoFiles.map(file => image.resizeIfNeeded(file!, { maxDimension: 1600, maxPixels: 2000000, quality: 0.82, mimeType: 'image/jpeg' })));
-            const { data } = await api.post('/api/breaksheet/process', { images: prepared.map(x => ({ data: x.data, mimeType: x.mimeType })) });
+            const prepared = await Promise.all(photoFiles.map(file => resizeImage(file!)));
+            const { data } = await api.post('/api/breaksheet/process', { images: prepared.map(data => ({ data, mimeType: 'image/jpeg' })) });
             setLiveRows(data.rows);
             setUpdateMessage('Planning mis à jour automatiquement · ' + data.detected + ' personnes détectées');
           } catch {
