@@ -711,15 +711,19 @@ const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data?.error || 'Erreur réseau');
+    const text = await res.text();
+    let data: any = {};
+    try { data = text ? JSON.parse(text) : {}; } catch { data = {}; }
+    if (!res.ok) {
+      throw new Error(data?.error || `Erreur serveur (${res.status})${text ? ` : ${text.slice(0, 180)}` : ''}`);
+    }
     return { data };
   },
 };
 
 async function resizeImage(file: File) {
   const bitmap = await createImageBitmap(file);
-  const maxDimension = 1600;
+  const maxDimension = 1200;
   const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
   const width = Math.max(1, Math.round(bitmap.width * scale));
   const height = Math.max(1, Math.round(bitmap.height * scale));
@@ -730,7 +734,7 @@ async function resizeImage(file: File) {
   if (!ctx) throw new Error('Canvas indisponible');
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
-  return canvas.toDataURL('image/jpeg', 0.82);
+  return canvas.toDataURL('image/jpeg', 0.68);
 }
 
 function minutes(t: string) {
