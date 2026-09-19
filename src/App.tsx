@@ -393,7 +393,6 @@ function App() {
             </>
           )}
         </main>
-      )}
       {selected && (
         <div className="overlay" onClick={() => setSelected(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
