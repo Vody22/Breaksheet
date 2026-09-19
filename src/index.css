@@ -456,3 +456,94 @@ h1 { font-size: 25px; margin: 2px 0; letter-spacing: -.045em; }
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Legal / trust pages */
+.siteFooter {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 6px 22px 92px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: #7d8796;
+  font-size: 10px;
+}
+.siteFooter nav { display: flex; gap: 14px; }
+.siteFooter a { color: inherit; text-decoration: none; font-weight: 800; }
+.siteFooter a:hover { color: #18202e; text-decoration: underline; }
+.dark .siteFooter a:hover { color: #f3f6fb; }
+
+.legalPage {
+  min-height: 100vh;
+  background: #f6f8fb;
+  color: #151a24;
+}
+.legalHeader {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+.legalBrand {
+  color: #151a24;
+  text-decoration: none;
+  font-weight: 950;
+  font-size: 20px;
+  letter-spacing: -.04em;
+}
+.legalBack {
+  color: #5f6a7b;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+}
+.legalBack:hover { text-decoration: underline; }
+.legalContent {
+  width: min(920px, calc(100% - 30px));
+  margin: 18px auto 60px;
+  padding: 34px;
+  background: #fff;
+  border: 1px solid #e0e5ed;
+  border-radius: 24px;
+  box-shadow: 0 12px 40px #1823380a;
+}
+.legalContent h1 {
+  margin: 7px 0 10px;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.03;
+  letter-spacing: -.045em;
+}
+.legalLead {
+  color: #687487;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+.legalContent section {
+  padding: 20px 0;
+  border-top: 1px solid #e8ebf0;
+}
+.legalContent h2 { margin: 0 0 7px; font-size: 18px; }
+.legalContent section p {
+  margin: 0;
+  color: #596577;
+  line-height: 1.7;
+  font-size: 13px;
+}
+.legalUpdated {
+  margin: 26px 0 0;
+  color: #8a93a2;
+  font-size: 10px;
+  font-weight: 800;
+}
+@media (max-width: 600px) {
+  .siteFooter { padding: 0 15px 94px; flex-direction: column; align-items: flex-start; }
+  .legalHeader { padding: 17px 15px; }
+  .legalContent { padding: 23px 19px; border-radius: 18px; }
+  .legalContent h1 { font-size: 32px; }
+}
