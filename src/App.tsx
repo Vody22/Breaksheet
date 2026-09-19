@@ -78,7 +78,7 @@ const rows: Row[] = [
   p('Frontierland','Nouveau Mexique','IKBEL','10:10','18:50','16:00','12:15'),
   p('Frontierland','Nouveau Mexique','HATAYI','11:10','18:50','15:45','13:00','17:15','D learn de 17h30 à 18h50'),
   p('Frontierland','Nouveau Mexique','MIGUEL','15:10','22:50','20:30','18:00'),
-  p('Frontierland','Casa de Coco','WILLIAM','10:40','16:20','13:00','','13:15'),
+  p('Frontierland','Casa de Coco','WILLIAM','10:40','16:20','13:45','14:00'),
   p('Frontierland','Casa de Coco','ILLONA','10:40','18:20','17:00','13:45','','après parade 17h50'),
   p('Frontierland','Casa de Coco','ALEXANDRE B','12:40','22:50','18:00','15:45','21:00'),
   p('Frontierland','Casa de Coco','LEA','14:10','22:50','20:30','17:15'),
