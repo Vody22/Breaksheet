@@ -292,3 +292,167 @@ h1 { font-size: 25px; margin: 2px 0; letter-spacing: -.045em; }
 @media (min-width: 821px) {
   .bottomNav { display: none; }
 }
+
+
+/* Motion system */
+:root { --ease-out: cubic-bezier(.22,1,.36,1); --ease-spring: cubic-bezier(.34,1.56,.64,1); }
+
+.app { animation: appReveal .55s var(--ease-out) both; transition: background .45s ease, color .35s ease; }
+.top, .dashboard, .content { animation: sectionReveal .65s var(--ease-out) both; }
+.top { animation-delay: .02s; }
+.dashboard { animation-delay: .07s; }
+.content { animation-delay: .12s; }
+
+.brandMark {
+  animation: markIn .7s var(--ease-spring) both;
+  transition: transform .25s var(--ease-spring), box-shadow .25s ease;
+}
+.brandMark:hover { transform: rotate(-5deg) scale(1.05); box-shadow: 0 12px 30px #10182830; }
+
+.icon { transition: transform .22s var(--ease-spring), box-shadow .22s ease, background .25s ease; }
+.icon:hover { transform: translateY(-2px) rotate(4deg); box-shadow: 0 10px 28px #18233818; }
+.icon:active { transform: scale(.92); }
+
+.welcome {
+  animation: heroIn .7s .12s var(--ease-out) both;
+  transition: transform .3s var(--ease-out), box-shadow .3s ease;
+}
+.welcome:hover { transform: translateY(-2px); box-shadow: 0 22px 55px #17203322; }
+.liveClock strong { display: inline-block; animation: clockPulse 2.8s ease-in-out infinite; }
+
+.statCard {
+  animation: cardIn .55s var(--ease-out) both;
+  transition: transform .22s var(--ease-spring), box-shadow .22s ease, border-color .22s ease;
+}
+.statCard:nth-child(1) { animation-delay: .18s; }
+.statCard:nth-child(2) { animation-delay: .23s; }
+.statCard:nth-child(3) { animation-delay: .28s; }
+.statCard:hover { transform: translateY(-3px); box-shadow: 0 12px 28px #18233812; }
+
+.nextStrip { animation: stripIn .6s .32s var(--ease-out) both; }
+.nextItems button { transition: transform .2s var(--ease-spring), border-color .2s ease, box-shadow .2s ease; }
+.nextItems button:hover { transform: translateX(3px); border-color: #cbd3df; box-shadow: 0 7px 18px #18233810; }
+.nextItems button:active { transform: scale(.98); }
+
+.tabs { transition: background .3s ease, border-color .3s ease; }
+.tabs button { position: relative; transition: color .25s ease, background .25s ease, transform .2s var(--ease-spring); }
+.tabs button:hover { transform: translateY(-1px); }
+.tabs button:active { transform: scale(.96); }
+.tabs .active { animation: tabPop .32s var(--ease-spring) both; }
+
+.search {
+  transition: transform .22s var(--ease-out), box-shadow .22s ease, border-color .22s ease;
+}
+.search:focus-within { transform: translateY(-1px); border-color: #aeb9c8; box-shadow: 0 10px 28px #18233812; }
+.search input { transition: color .2s ease; }
+
+.landPills button {
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s var(--ease-spring), background .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.landPills button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 25%, #ffffff55 50%, transparent 75%);
+  transform: translateX(-130%);
+  transition: transform .55s ease;
+}
+.landPills button:hover::after { transform: translateX(130%); }
+.landPills button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px #18233810; }
+.landPills button:active { transform: scale(.95); }
+.landPills button.selected { animation: pillSelect .35s var(--ease-spring) both; }
+
+.panel, .nowPage {
+  animation: panelIn .6s var(--ease-out) both;
+  transition: transform .28s var(--ease-out), box-shadow .28s ease, border-color .25s ease, background .35s ease;
+}
+.panel:hover, .nowPage:hover { box-shadow: 0 13px 38px #1823380d; }
+
+.landAccent { transform-origin: left; animation: accentGrow .7s .15s var(--ease-out) both; }
+
+.card {
+  animation: cardIn .48s var(--ease-out) both;
+  transition: transform .2s var(--ease-spring), box-shadow .2s ease, border-color .2s ease, background .25s ease;
+}
+.card:nth-child(1) { animation-delay: .03s; }
+.card:nth-child(2) { animation-delay: .055s; }
+.card:nth-child(3) { animation-delay: .08s; }
+.card:nth-child(4) { animation-delay: .105s; }
+.card:nth-child(5) { animation-delay: .13s; }
+.card:nth-child(6) { animation-delay: .155s; }
+.card:nth-child(7) { animation-delay: .18s; }
+.card:nth-child(8) { animation-delay: .205s; }
+.card:nth-child(9) { animation-delay: .23s; }
+.card:nth-child(10) { animation-delay: .255s; }
+.card:active { transform: scale(.985); }
+.avatar { transition: transform .25s var(--ease-spring), box-shadow .25s ease; }
+.card:hover .avatar { transform: scale(1.07) rotate(-2deg); box-shadow: 0 7px 16px #17203318; }
+.stateBadge { transition: transform .25s var(--ease-spring), box-shadow .25s ease; }
+.card:hover .stateBadge { transform: scale(1.04); }
+.currentCard .stateBadge.en-shift { animation: liveBadge 1.8s ease-in-out infinite; }
+
+.times span { transition: transform .2s var(--ease-spring); }
+.card:hover .times span { transform: translateY(-1px); }
+
+.cardInfo { animation: infoIn .45s var(--ease-out) both; }
+
+.empty { animation: emptyIn .5s var(--ease-out) both; }
+.empty svg { animation: floatIcon 2.6s ease-in-out infinite; }
+
+.overlay {
+  animation: overlayIn .25s ease both;
+}
+.modal {
+  animation: modalIn .45s var(--ease-spring) both;
+}
+.close { transition: transform .2s var(--ease-spring), background .2s ease; }
+.close:hover { transform: rotate(90deg) scale(1.06); }
+.close:active { transform: scale(.9); }
+.modalTop .avatar { animation: markIn .55s .08s var(--ease-spring) both; }
+.detailGrid div {
+  animation: detailIn .4s var(--ease-out) both;
+}
+.detailGrid div:nth-child(1) { animation-delay: .12s; }
+.detailGrid div:nth-child(2) { animation-delay: .17s; }
+.detailGrid div:nth-child(3) { animation-delay: .22s; }
+.nextBreak { animation: nextBreakIn .5s .24s var(--ease-out) both; }
+
+.bottomNav { animation: navIn .55s .2s var(--ease-out) both; }
+.bottomNav button { transition: transform .2s var(--ease-spring), background .25s ease, color .25s ease; }
+.bottomNav button:active { transform: scale(.9); }
+.bottomNav button.active { animation: navActive .32s var(--ease-spring) both; }
+.bottomNav i { animation: badgePop .4s var(--ease-spring) both; }
+
+@keyframes appReveal { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sectionReveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes heroIn { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes markIn { from { opacity: 0; transform: scale(.65) rotate(-12deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes panelIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes stripIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes accentGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes tabPop { from { transform: scale(.94); } to { transform: scale(1); } }
+@keyframes pillSelect { from { transform: scale(.94); } to { transform: scale(1); } }
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalIn { from { opacity: 0; transform: translateY(24px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes detailIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes nextBreakIn { from { opacity: 0; transform: translateY(7px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes navIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes navActive { from { transform: scale(.94); } to { transform: scale(1); } }
+@keyframes badgePop { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes clockPulse { 0%,100% { opacity: 1; } 50% { opacity: .7; } }
+@keyframes liveBadge { 0%,100% { box-shadow: 0 0 0 0 #6fd08d00; } 50% { box-shadow: 0 0 0 4px #6fd08d22; } }
+@keyframes infoIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes emptyIn { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes floatIcon { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
