@@ -1,3 +1,6 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+
 import {
   Search,
   Moon,
@@ -192,7 +195,7 @@ function nextBreak(r: Row, now: number) {
     .find(x => minutes(x.time) > now);
 }
 
-function App() {
+function SiteApp() {
   const [land, setLand] = useState('Tous');
   const [sector, setSector] = useState('Tous');
   const [q, setQ] = useState('');
@@ -398,6 +401,15 @@ function App() {
         <button className={q ? 'active' : ''} onClick={() => { setTab('planning'); document.querySelector<HTMLInputElement>('.search input')?.focus(); }}><Search /><span>Recherche</span></button>
       </nav>
 
+
+      <footer className="siteFooter">
+        <span>Breaksheet · planning du jour</span>
+        <nav aria-label="Liens légaux">
+          <a href="/confidentialite">Confidentialité</a>
+          <a href="/cgu">CGU</a>
+        </nav>
+      </footer>
+
       {selected && (
         <div className="overlay" onClick={() => setSelected(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -424,6 +436,88 @@ function App() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+
+function App() {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+
+  return (
+    <>
+      <Analytics />
+      {path === '/confidentialite' ? <LegalPage type="privacy" /> : path === '/cgu' ? <LegalPage type="terms" /> : <SiteApp />}
+    </>
+  );
+}
+
+function LegalPage({ type }: { type: 'privacy' | 'terms' }) {
+  const privacy = type === 'privacy';
+  return (
+    <div className="legalPage">
+      <header className="legalHeader">
+        <a className="legalBrand" href="/">Breaksheet</a>
+        <a className="legalBack" href="/">Retour au planning</a>
+      </header>
+      <main className="legalContent">
+        <div className="eyebrow">{privacy ? 'CONFIDENTIALITÉ' : 'CONDITIONS D’UTILISATION'}</div>
+        <h1>{privacy ? 'Politique de confidentialité' : 'Conditions générales d’utilisation'}</h1>
+        <p className="legalLead">
+          {privacy
+            ? 'Cette page explique simplement quelles données sont traitées par Breaksheet.'
+            : 'Les règles d’utilisation du site Breaksheet sont présentées ci-dessous.'}
+        </p>
+
+        {privacy ? (
+          <>
+            <section>
+              <h2>Données collectées</h2>
+              <p>Breaksheet est une interface de consultation du planning. Aucune inscription, aucun compte et aucun formulaire de contact ne sont nécessaires pour utiliser le site.</p>
+            </section>
+            <section>
+              <h2>Mesure d’audience</h2>
+              <p>Le site utilise Vercel Web Analytics pour mesurer l’usage général du site. L’intégration est conçue pour fonctionner sans cookie de suivi publicitaire. Aucune donnée n’est vendue à des fins publicitaires.</p>
+            </section>
+            <section>
+              <h2>Cookies et stockage local</h2>
+              <p>Breaksheet n’utilise pas de cookie publicitaire ou de cookie de connexion. Le changement de thème et les filtres sont gérés dans l’interface et ne nécessitent pas de compte.</p>
+            </section>
+            <section>
+              <h2>Contenu du planning</h2>
+              <p>Les informations affichées correspondent aux données de planning intégrées au site. Elles ne constituent pas un système RH ou une source officielle de paie.</p>
+            </section>
+            <section>
+              <h2>Vos droits</h2>
+              <p>Pour toute question relative à une donnée personnelle éventuellement présente dans le planning, la demande doit être adressée au responsable qui exploite ce planning. Le site ne propose pas de compte utilisateur ni de profil public permettant de modifier ces données directement.</p>
+            </section>
+          </>
+        ) : (
+          <>
+            <section>
+              <h2>Objet</h2>
+              <p>Breaksheet fournit une interface de consultation d’un planning de shifts, pauses et lunchs.</p>
+            </section>
+            <section>
+              <h2>Utilisation</h2>
+              <p>Le site est destiné à la consultation. L’utilisateur s’engage à ne pas tenter de perturber le fonctionnement du service, contourner ses protections ou utiliser les données affichées à des fins incompatibles avec leur contexte.</p>
+            </section>
+            <section>
+              <h2>Données et exactitude</h2>
+              <p>Les horaires peuvent évoluer. Le planning affiché doit être vérifié avec la source opérationnelle lorsqu’une information officielle est requise.</p>
+            </section>
+            <section>
+              <h2>Disponibilité</h2>
+              <p>Le service peut être modifié, interrompu ou déployé à nouveau sans garantie de disponibilité permanente.</p>
+            </section>
+            <section>
+              <h2>Responsabilité</h2>
+              <p>Breaksheet est un outil de consultation et ne remplace pas les procédures, consignes ou systèmes officiels de l’organisation concernée.</p>
+            </section>
+          </>
+        )}
+        <p className="legalUpdated">Dernière mise à jour : 19 septembre 2026</p>
+      </main>
     </div>
   );
 }
