@@ -1,12 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
 import {
   Search,
   Moon,
   Sun,
   Clock3,
   Users,
-  ChevronDown,
   X,
+  CalendarDays,
+  Coffee,
+  Utensils,
+  MapPin,
+  ChevronRight,
+  CircleUserRound,
 } from 'lucide-react';
 
 type Row = {
@@ -150,12 +154,7 @@ const rows: Row[] = [
 ];
 
 
-const leaders = {
-  OPEN: ['GIUSEPPE', 'ERICK'],
-  'MIDDLE 1': ['RAI', 'MATHIEU'],
-  'MIDDLE 2': ['FLO'],
-  CLOSE: ['MAHER', 'JP'],
-};
+
 const lands = [
   'Tous',
   'Fantasyland',
@@ -169,10 +168,12 @@ function minutes(t: string) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
 }
+
 function state(r: Row, now: number) {
-  const s = minutes(r.start),
-    e = minutes(r.end);
-  if (now < s || now > e) return 'Hors shift';
+  const s = minutes(r.start);
+  const e = minutes(r.end);
+  if (now < s) return 'À venir';
+  if (now > e) return 'Terminé';
   for (const [key, label] of [
     ['break1', 'Pause'],
     ['lunch', 'Lunch'],
@@ -183,19 +184,31 @@ function state(r: Row, now: number) {
   }
   return 'En shift';
 }
+
+function nextBreak(r: Row, now: number) {
+  return [r.break1, r.lunch, r.break2]
+    .filter(Boolean)
+    .map(time => ({ time: time as string, type: time === r.lunch ? 'Lunch' : 'Pause' }))
+    .find(x => minutes(x.time) > now);
+}
+
 function App() {
-  const [land, setLand] = useState('Tous'),
-    [sector, setSector] = useState('Tous'),
-    [q, setQ] = useState(''),
-    [tab, setTab] = useState<'planning' | 'now'>('planning'),
-    [dark, setDark] = useState(false),
-    [selected, setSelected] = useState<Row | null>(null),
-    [now, setNow] = useState(new Date());
+  const [land, setLand] = useState('Tous');
+  const [sector, setSector] = useState('Tous');
+  const [q, setQ] = useState('');
+  const [tab, setTab] = useState<'planning' | 'now'>('planning');
+  const [dark, setDark] = useState(false);
+  const [selected, setSelected] = useState<Row | null>(null);
+  const [now, setNow] = useState(new Date());
+
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30000);
     return () => window.clearInterval(timer);
   }, []);
+
   const activeRows = rows;
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
   const sectors = useMemo(
     () => [
       'Tous',
@@ -207,8 +220,9 @@ function App() {
         )
       ),
     ],
-    [land, activeRows]
+    [land]
   );
+
   const filtered = useMemo(
     () =>
       activeRows.filter(
@@ -217,209 +231,195 @@ function App() {
           (sector === 'Tous' || r.sector === sector) &&
           r.name.toLowerCase().includes(q.toLowerCase())
       ),
-    [land, sector, q, activeRows]
+    [land, sector, q]
   );
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const nowRows = useMemo(
+
+  const liveRows = useMemo(
+    () => activeRows.filter(r => {
+      const s = state(r, currentMinutes);
+      return s === 'En shift' || s === 'Pause' || s === 'Lunch';
+    }),
+    [currentMinutes]
+  );
+
+  const breakRows = useMemo(
+    () => activeRows.filter(r => ['Pause', 'Lunch'].includes(state(r, currentMinutes))),
+    [currentMinutes]
+  );
+
+  const nextEvents = useMemo(
     () =>
       activeRows
-        .filter(r => state(r, currentMinutes) === 'En shift')
-        .sort((a, b) => minutes(a.end) - minutes(b.end)),
-    [currentMinutes, activeRows]
+        .flatMap(r => {
+          const next = nextBreak(r, currentMinutes);
+          return next ? [{ r, ...next }] : [];
+        })
+        .sort((a, b) => minutes(a.time) - minutes(b.time))
+        .slice(0, 3),
+    [currentMinutes]
   );
+
+  const displayedNow = useMemo(() => {
+    const order = { Pause: 0, Lunch: 1, 'En shift': 2 } as Record<string, number>;
+    return [...liveRows].sort(
+      (a, b) => (order[state(a, currentMinutes)] ?? 9) - (order[state(b, currentMinutes)] ?? 9)
+    );
+  }, [liveRows, currentMinutes]);
+
   const landClass = (l: string) => l.toLowerCase().replace(/[^a-z]+/g, '-');
+
   return (
     <div className={dark ? 'app dark' : 'app'}>
       <header className="top">
-        <div>
-          <div className="eyebrow">CUSTODIAL DLP</div>
-          <h1>
-            Breaksheet
-          </h1>
-          <div className="meta">
-            Samedi 19/09/2026 · planning chargé
+        <div className="brand">
+          <div className="brandMark">B</div>
+          <div>
+            <div className="eyebrow">CUSTODIAL DLP</div>
+            <h1>Breaksheet</h1>
+            <div className="meta"><CalendarDays /> Samedi 19/09/2026 · planning chargé</div>
           </div>
         </div>
-        <button
-          className="icon"
-          onClick={() => setDark(!dark)}
-          aria-label="Mode sombre"
-        >
+        <button className="icon" onClick={() => setDark(!dark)} aria-label="Mode sombre">
           {dark ? <Sun /> : <Moon />}
         </button>
       </header>
-      {false && <div className="hero">
-        <div className="heroStat">
-          <Clock3 />
+
+      <section className="dashboard">
+        <div className="welcome">
           <div>
-            <b>
-              {now.toLocaleTimeString('fr-FR', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </b>
-            <small>heure actuelle</small>
+            <div className="eyebrow">AUJOURD'HUI</div>
+            <h2>{tab === 'now' ? 'Vue en direct' : 'Planning du jour'}</h2>
+            <p>{liveRows.length} Cast Members actuellement actifs · {breakRows.length} en pause ou lunch</p>
+          </div>
+          <div className="liveClock">
+            <span>MAINTENANT</span>
+            <strong>{now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</strong>
           </div>
         </div>
-        <div className="heroStat heroNext">
-          <Clock3 />
-          <div>
-            <b>{nextEvent ? nextEvent.time : '—'}</b>
-            <small>{nextEvent ? nextEvent.type + ' · ' + nextEvent.r.name : 'aucun créneau restant'}</small>
-          </div>
+        <div className="stats">
+          <div className="statCard"><Users /><strong>{rows.length}</strong><span>Cast Members</span></div>
+          <div className="statCard"><Clock3 /><strong>{liveRows.length}</strong><span>En shift</span></div>
+          <div className="statCard"><Coffee /><strong>{breakRows.length}</strong><span>Pause / lunch</span></div>
         </div>
-        <div className="heroStat heroCountdown">
-          <div>
-            <b>—</b>
-            <small>prochaine pause / lunch</small>
+        {nextEvents.length > 0 && (
+          <div className="nextStrip">
+            <div className="nextLabel"><Clock3 /> PROCHAINS CRÉNEAUX</div>
+            <div className="nextItems">
+              {nextEvents.map(x => (
+                <button key={x.r.name + x.time} onClick={() => setSelected(x.r)}>
+                  <b>{x.time}</b>
+                  <span>{x.type} · {x.r.name}</span>
+                  <ChevronRight />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="heroStat">
-          <Users />
-          <div>
-            <b>{nowRows.length}</b>
-            <small>en shift maintenant</small>
-          </div>
-        </div>
-      </div>}
+        )}
+      </section>
+
       <nav className="tabs">
-        <button
-          className={tab === 'planning' ? 'active' : ''}
-          onClick={() => setTab('planning')}
-        >
-          Planning
+        <button className={tab === 'planning' ? 'active' : ''} onClick={() => setTab('planning')}>
+          <CalendarDays /> Planning
         </button>
-        <button
-          className={tab === 'now' ? 'active' : ''}
-          onClick={() => setTab('now')}
-        >
-          Maintenant
+        <button className={tab === 'now' ? 'active' : ''} onClick={() => setTab('now')}>
+          <Clock3 /> Maintenant
+          {liveRows.length > 0 && <span className="tabCount">{liveRows.length}</span>}
         </button>
       </nav>
-              <main className="content">
-          <div className="filters">
-            <div className="search">
-              <Search />
-              <input
-                value={q}
-                onChange={e => setQ(e.target.value)}
-                placeholder="Rechercher un Cast Member..."
-              />
-              {q && (
-                <button onClick={() => setQ('')}>
-                  <X />
-                </button>
-              )}
-            </div>
-            <div className="selects">
-              <label>
-                Land
-                <select
-                  value={land}
-                  onChange={e => {
-                    setLand(e.target.value);
-                    setSector('Tous');
-                  }}
-                >
-                  {lands.map(x => (
-                    <option>{x}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Secteur
-                <select
-                  value={sector}
-                  onChange={e => setSector(e.target.value)}
-                >
-                  {sectors.map(x => (
-                    <option>{x}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
+
+      <main className="content">
+        <div className="filters">
+          <div className="search">
+            <Search />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Rechercher un Cast Member..." />
+            {q && <button onClick={() => setQ('')}><X /></button>}
           </div>
-          {tab === 'now' ? (
-            <section className="panel">
-              <div className="sectionHead">
-                <div>
-                  <div className="eyebrow">TEMPS RÉEL</div>
-                  <h2>En shift maintenant</h2>
-                </div>
-                <span className="count">{nowRows.length}</span>
-              </div>
-              <div className="cards">
-                {nowRows.map(r => (
-                  <Card
-                    key={r.name + r.sector}
-                    r={r}
-                    onClick={() => setSelected(r)}
-                    current={true}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : (
-            <>
-              {lands.slice(1).map(l => {
-                if (land !== 'Tous' && land !== l) return null;
-                const rs = filtered.filter(r => r.land === l);
-                if (!rs.length) return null;
-                return (
-                  <section className="panel landPanel" key={l}>
-                    <div className={'landAccent ' + landClass(l)}></div>
-                    <div className="sectionHead">
-                      <div>
-                        <div className="eyebrow">{l}</div>
-                        <h2>
-                          {Array.from(new Set(rs.map(r => r.sector))).length}{' '}
-                          secteurs · {rs.length} personnes
-                        </h2>
-                      </div>
-                      <ChevronDown />
-                    </div>
-                    <div className="cards">
-                      {rs.map(r => (
-                        <Card
-                          key={r.name + r.sector}
-                          r={r}
-                          onClick={() => setSelected(r)}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
-            </>
+          <div className="landPills">
+            {lands.map(x => (
+              <button key={x} className={land === x ? 'selected' : ''} onClick={() => { setLand(x); setSector('Tous'); }}>
+                {x}
+              </button>
+            ))}
+          </div>
+          {land !== 'Tous' && (
+            <select className="sectorSelect" value={sector} onChange={e => setSector(e.target.value)}>
+              {sectors.map(x => <option key={x}>{x}</option>)}
+            </select>
           )}
-        </main>
+        </div>
+
+        {tab === 'now' ? (
+          <section className="nowPage">
+            <div className="sectionHead">
+              <div>
+                <div className="eyebrow">TEMPS RÉEL</div>
+                <h2>Ce qui se passe maintenant</h2>
+              </div>
+              <span className="count">{displayedNow.length}</span>
+            </div>
+            {displayedNow.length ? (
+              <div className="cards">
+                {displayedNow.map(r => <Card key={r.name + r.sector} r={r} onClick={() => setSelected(r)} current />)}
+              </div>
+            ) : (
+              <div className="empty"><Clock3 /><b>Aucun shift en cours</b><span>Consulte le planning pour les prochains départs.</span></div>
+            )}
+          </section>
+        ) : (
+          <>
+            {lands.slice(1).map(l => {
+              if (land !== 'Tous' && land !== l) return null;
+              const rs = filtered.filter(r => r.land === l);
+              if (!rs.length) return null;
+              return (
+                <section className="panel landPanel" key={l}>
+                  <div className={'landAccent ' + landClass(l)} />
+                  <div className="sectionHead">
+                    <div>
+                      <div className="eyebrow">{l}</div>
+                      <h2>{rs.length} personnes <span>·</span> {Array.from(new Set(rs.map(r => r.sector))).length} secteurs</h2>
+                    </div>
+                    <MapPin className="sectionIcon" />
+                  </div>
+                  <div className="cards">
+                    {rs.map(r => <Card key={r.name + r.sector} r={r} onClick={() => setSelected(r)} />)}
+                  </div>
+                </section>
+              );
+            })}
+            {!filtered.length && <div className="empty"><CircleUserRound /><b>Aucun Cast Member trouvé</b><span>Modifie la recherche ou le filtre.</span></div>}
+          </>
+        )}
+      </main>
+
+      <nav className="bottomNav">
+        <button className={tab === 'planning' ? 'active' : ''} onClick={() => setTab('planning')}><CalendarDays /><span>Planning</span></button>
+        <button className={tab === 'now' ? 'active' : ''} onClick={() => setTab('now')}><Clock3 /><span>Maintenant</span>{liveRows.length > 0 && <i>{liveRows.length}</i>}</button>
+        <button className={q ? 'active' : ''} onClick={() => { setTab('planning'); document.querySelector<HTMLInputElement>('.search input')?.focus(); }}><Search /><span>Recherche</span></button>
+      </nav>
+
       {selected && (
         <div className="overlay" onClick={() => setSelected(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <button className="close" onClick={() => setSelected(null)}>
-              <X />
-            </button>
-            <div className="eyebrow">
-              {selected.land} · {selected.sector}
+            <button className="close" onClick={() => setSelected(null)}><X /></button>
+            <div className="modalTop">
+              <div className="avatar">{selected.name.slice(0, 1)}</div>
+              <div><div className="eyebrow">{selected.land}</div><span className="modalSector">{selected.sector}</span></div>
             </div>
             <h2>{selected.name}</h2>
-            <div className="bigShift">
-              {selected.start} <span>→</span> {selected.end}
-            </div>
+            <div className="modalShift"><Clock3 /> {selected.start} <span>→</span> {selected.end}</div>
             <div className="detailGrid">
-              <div>
-                <small>Break 1</small>
-                <b>{selected.break1 || '—'}</b>
-              </div>
-              <div>
-                <small>Lunch</small>
-                <b>{selected.lunch || '—'}</b>
-              </div>
-              <div>
-                <small>Break 2</small>
-                <b>{selected.break2 || '—'}</b>
-              </div>
+              <div><Coffee /><small>Break 1</small><b>{selected.break1 || '—'}</b></div>
+              <div><Utensils /><small>Lunch</small><b>{selected.lunch || '—'}</b></div>
+              <div><Coffee /><small>Break 2</small><b>{selected.break2 || '—'}</b></div>
             </div>
+            {nextBreak(selected, currentMinutes) && (
+              <div className="nextBreak">
+                <span>PROCHAIN CRÉNEAU</span>
+                <b>{nextBreak(selected, currentMinutes)?.time}</b>
+                <small>{nextBreak(selected, currentMinutes)?.type}</small>
+              </div>
+            )}
             {selected.info && <div className="info">{selected.info}</div>}
           </div>
         </div>
@@ -427,54 +427,31 @@ function App() {
     </div>
   );
 }
-function Card({
-  r,
-  onClick,
-  current = false,
-}: {
-  r: Row;
-  onClick: () => void;
-  current?: boolean;
-}) {
+
+function Card({ r, onClick, current = false }: { r: Row; onClick: () => void; current?: boolean }) {
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
-  const shiftStart = minutes(r.start);
-  const shiftEnd = minutes(r.end);
   const status = state(r, nowMin);
-  const progress = Math.min(100, Math.max(0, ((nowMin - shiftStart) / Math.max(1, shiftEnd - shiftStart)) * 100));
   return (
-    <button className="card" onClick={onClick}>
+    <button className={'card ' + (current ? 'currentCard' : '')} onClick={onClick}>
       <div className="cardTop">
-        <div>
-          <small>
-            {r.land} · {r.sector}
-          </small>
-          <h3>{r.name}</h3>
+        <div className="person">
+          <div className="avatar">{r.name.slice(0, 1)}</div>
+          <div>
+            <small>{r.sector}</small>
+            <h3>{r.name}</h3>
+          </div>
         </div>
-        {current && <span className="live">EN SHIFT</span>}
+        <span className={'stateBadge ' + status.toLowerCase().replaceAll(' ', '-')}>{status}</span>
       </div>
-      <div className="shiftRow">
-        <div className="shift">{r.start}<span>→</span>{r.end}</div>
-        <span className={'stateBadge ' + status.toLowerCase().replace(' ', '-')}>{status}</span>
-      </div>
-      <div className="progressTrack">
-        <div className="progressFill" style={{ width: progress + '%' }} />
-      </div>
+      <div className="shiftRow"><Clock3 /><div className="shift">{r.start}<span>→</span>{r.end}</div></div>
       <div className="times">
-        <span>
-          <i>Break</i>
-          {r.break1 || '—'}
-        </span>
-        <span>
-          <i>Lunch</i>
-          {r.lunch || '—'}
-        </span>
-        <span>
-          <i>Break</i>
-          {r.break2 || '—'}
-        </span>
+        <span><i>Break</i>{r.break1 || '—'}</span>
+        <span><i>Lunch</i>{r.lunch || '—'}</span>
+        <span><i>Break</i>{r.break2 || '—'}</span>
       </div>
       {r.info && <div className="cardInfo">{r.info}</div>}
     </button>
   );
 }
+
 export default App;
